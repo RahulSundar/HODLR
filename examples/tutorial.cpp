@@ -1,12 +1,12 @@
 // This file serves as a gentle introduction to the usage of this library:
 
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "HODLR.hpp"
 #include "KDTree.hpp"
 
-// Derived class of HODLR_Matrix which is ultimately
+// Derived class of Matrix which is ultimately
 // passed to the HODLR_Tree class:
-class Kernel : public HODLR_Matrix 
+class Kernel : public Matrix 
 {
 
 private:
@@ -15,7 +15,7 @@ private:
 public:
 
     // Constructor:
-    Kernel(int N, int dim) : HODLR_Matrix(N) 
+    Kernel(int N, int dim) : Matrix(N) 
     {
         x = (Mat::Random(N, dim)).real();
         // This is being sorted to ensure that we get
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         tolerance  = pow(10, -atoi(argv[4]));
     }
 
-    // Declaration of HODLR_Matrix object that abstracts data in Matrix:
+    // Declaration of Matrix object that abstracts data in Matrix:
     Kernel* K = new Kernel(N, dim);
     std::cout << "========================= Problem Parameters =========================" << std::endl;
     std::cout << "Matrix Size                        :" << N << std::endl;

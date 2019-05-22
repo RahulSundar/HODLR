@@ -1,18 +1,18 @@
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 
 extern "C" 
 {
     double get_matrix_entry(int* i, int* j);
 }
 
-class Kernel : public HODLR_Matrix
+class Kernel : public Matrix
 {
 private:
     Mat x;
 
 public:
     // Constructor:
-    Kernel(int N) : HODLR_Matrix(N) 
+    Kernel(int N) : Matrix(N) 
     {
         x = (Mat::Random(N, 1)).real();
     };

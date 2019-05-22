@@ -1,9 +1,9 @@
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "HODLR.hpp"
 
 // Taking Matern Kernel for p = 2:
 // K(r) = σ^2 * (1 + sqrt(5) * r / ρ + 5/3 * (r / ρ)^2) * exp(-sqrt(5) * r / ρ)
-class Kernel : public HODLR_Matrix 
+class Kernel : public Matrix 
 {
 
 private:
@@ -13,7 +13,7 @@ private:
 public:
 
     // Constructor:
-    Kernel(int N, double sigma, double rho) : HODLR_Matrix(N) 
+    Kernel(int N, double sigma, double rho) : Matrix(N) 
     {
         x                   = (Vec::Random(N)).real();
         this->sigma_squared = sigma * sigma;
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         tolerance  = pow(10, -atoi(argv[3]));
     }
 
-    // Declaration of HODLR_Matrix object that abstracts data in Matrix:
+    // Declaration of Matrix object that abstracts data in Matrix:
     // Taking σ = 10, ρ = 5:
     Kernel* K            = new Kernel(N, 10, 5);
 

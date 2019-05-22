@@ -7,7 +7,7 @@ x = 3 + np.sort(np.random.rand(N))
 y = 7 + np.sort(np.random.rand(N))
 
 # Returning the Gaussian Kernel:
-class Kernel(pyhodlrlib.HODLR_Matrix):
+class Kernel(pyhodlrlib.Matrix):
     def getMatrixEntry(self, i, j):
         return np.exp(-(x[i] - y[j])**2)
 

@@ -1,4 +1,4 @@
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "LowRank.hpp"
 #include "HODLR.hpp"
 
@@ -7,17 +7,17 @@
 
 namespace py = pybind11;
 
-class PyMatrix : public HODLR_Matrix
+class PyMatrix : public Matrix
 {
 public:
     /* Inherit the constructors */
-    using HODLR_Matrix::HODLR_Matrix;
+    using Matrix::Matrix;
 
     /* Trampoline (need one for each virtual function) */
     dtype getMatrixEntry(int i, int j) override 
     {
         PYBIND11_OVERLOAD_PURE(dtype,          /* Return type */
-                               HODLR_Matrix,   /* Parent class */
+                               Matrix,         /* Parent class */
                                getMatrixEntry, /* Name of function in C++ (must match Python name) */
                                i, j            /* Arguments */
                               );
@@ -28,15 +28,15 @@ PYBIND11_MODULE(pyhodlrlib, m)
 {
     m.doc() = "This is the Python Wrapper to HODLRlib";
 
-    py::class_<HODLR_Matrix, PyMatrix> hodlr_matrix(m, "HODLR_Matrix");
-    hodlr_matrix
+    py::class_<Matrix, PyMatrix> matrix(m, "Matrix");
+    matrix
         .def(py::init<int>())
-        .def("getMatrixEntry", &HODLR_Matrix::getMatrixEntry)
-        .def("getMatrix", &HODLR_Matrix::getMatrix);
+        .def("getMatrixEntry", &Matrix::getMatrixEntry)
+        .def("getMatrix", &Matrix::getMatrix);
 
     py::class_<LowRank> lowrank(m, "LowRank");
     lowrank
-        .def(py::init<HODLR_Matrix*, std::string>())
+        .def(py::init<Matrix*, std::string>())
         .def("factorize", &LowRank::factorize)
         .def("getL", &LowRank::getL)
         .def("getR", &LowRank::getR);

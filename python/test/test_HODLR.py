@@ -6,7 +6,7 @@ N = 500
 x = np.sort(np.random.rand(N))
 
 # Returning the Gaussian Kernel:
-class Kernel(pyhodlrlib.HODLR_Matrix):
+class Kernel(pyhodlrlib.Matrix):
     def getMatrixEntry(self, i, j):
         if(i == j):
             return 10

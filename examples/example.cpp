@@ -1,5 +1,5 @@
 // Example provided by Michael-Hartmann:
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "HODLR.hpp"
 
 #define LMAX 6000
@@ -24,10 +24,10 @@ double logKn(int n, double x)
 }
 
 
-class Test_Kernel : public HODLR_Matrix
+class Test_Kernel : public Matrix
 {
 public:
-    explicit Test_Kernel (unsigned N) : HODLR_Matrix(N) 
+    explicit Test_Kernel (unsigned N) : Matrix(N) 
     {};
 
     dtype getMatrixEntry(int i, int j)

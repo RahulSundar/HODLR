@@ -1,10 +1,10 @@
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "LowRank.hpp"
 #include "KDTree.hpp"
 
-// Derived class of HODLR_Matrix which is ultimately
+// Derived class of Matrix which is ultimately
 // passed to the HODLR_Tree class:
-class Kernel : public HODLR_Matrix 
+class Kernel : public Matrix 
 {
 
 private:
@@ -13,7 +13,7 @@ private:
 public:
 
     // Constructor:
-    Kernel(int N) : HODLR_Matrix(N) 
+    Kernel(int N) : Matrix(N) 
     {
         x = 2 * Vec::Ones(N) + Vec::Random(N);
         y = 7 * Vec::Ones(N) + Vec::Random(N);
@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     std::cout << "Matrix Size :" << N << std::endl;
     std::cout << "Tolerance   :" << tolerance << std::endl << std::endl;
 
-    // Declaration of HODLR_Matrix object that abstracts data in Matrix:
+    // Declaration of Matrix object that abstracts data in Matrix:
     Kernel* K   = new Kernel(N);
     LowRank* F1 = new LowRank(K, "rookPivoting");
     LowRank* F2 = new LowRank(K, "queenPivoting");

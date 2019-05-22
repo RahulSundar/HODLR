@@ -71,7 +71,7 @@ include_directories("${EIGEN_PATH}"
 ################ MENTIONING C++ FILES TO LINK WITH HEADERS + FILE TO BUILD ####################
 
 set(HODLRlib_SRCS
-    ${PROJECT_SOURCE_DIR}/src/HODLR_Matrix.cpp
+    ${PROJECT_SOURCE_DIR}/src/Matrix.cpp
     ${PROJECT_SOURCE_DIR}/src/LowRank.cpp
     ${PROJECT_SOURCE_DIR}/src/HODLR_Node.cpp
     ${PROJECT_SOURCE_DIR}/src/HODLR.cpp

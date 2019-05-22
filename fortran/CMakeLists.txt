@@ -36,7 +36,7 @@ include_directories("${EIGEN_PATH}"
 
 ################ MENTIONING C++ FILES TO LINK WITH HEADERS + FILE TO BUILD ####################
 set(HODLRlib_SRCS
-    ${HODLR_PATH}/src/HODLR_Matrix.cpp
+    ${HODLR_PATH}/src/Matrix.cpp
     ${HODLR_PATH}/src/KDTree.cpp
     ${HODLR_PATH}/src/LowRank.cpp
     ${HODLR_PATH}/src/HODLR_Node.cpp

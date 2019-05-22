@@ -1,6 +1,6 @@
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 
-Vec HODLR_Matrix::getRow(const int j, const int n_col_start, const int n_cols) 
+Vec Matrix::getRow(const int j, const int n_col_start, const int n_cols) 
 {
     Vec row(n_cols);
     #pragma omp parallel for
@@ -12,7 +12,7 @@ Vec HODLR_Matrix::getRow(const int j, const int n_col_start, const int n_cols)
     return row;
 }
 
-Vec HODLR_Matrix::getCol(const int k, const int n_row_start, const int n_rows) 
+Vec Matrix::getCol(const int k, const int n_row_start, const int n_rows) 
 {
     Vec col(n_rows);
     #pragma omp parallel for
@@ -24,8 +24,8 @@ Vec HODLR_Matrix::getCol(const int k, const int n_row_start, const int n_rows)
     return col;
 }
 
-Vec HODLR_Matrix::getDiag1(const int n_row_start, const int n_col_start, 
-                           const int n_rows, const int n_cols) 
+Vec Matrix::getDiag1(const int n_row_start, const int n_col_start, 
+                     const int n_rows, const int n_cols) 
 {
     int N = std::max(n_rows, n_cols);
     Vec diag(N);
@@ -52,8 +52,8 @@ Vec HODLR_Matrix::getDiag1(const int n_row_start, const int n_col_start,
     return diag;
 }
 
-Vec HODLR_Matrix::getDiag2(const int n_row_start, const int n_col_start, 
-                           const int n_rows, const int n_cols) 
+Vec Matrix::getDiag2(const int n_row_start, const int n_col_start, 
+                     const int n_rows, const int n_cols) 
 {
     int N = std::max(n_rows, n_cols);
     Vec diag(N);
@@ -80,8 +80,8 @@ Vec HODLR_Matrix::getDiag2(const int n_row_start, const int n_col_start,
     return diag;
 }
 
-Mat HODLR_Matrix::getMatrix(const int n_row_start, const int n_col_start, 
-                            const int n_rows, const int n_cols) 
+Mat Matrix::getMatrix(const int n_row_start, const int n_col_start, 
+                      const int n_rows, const int n_cols) 
 {
     Mat mat(n_rows, n_cols);
     

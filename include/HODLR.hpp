@@ -61,7 +61,7 @@ public:
     // Lists details of all boxes in the tree
     void printTreeDetails();
     void plotTree(std::string image_name);
-    void assemble(HODLR_Matrix* A, std::string lowrank_type = "rookPivoting", 
+    void assemble(Matrix* A, std::string lowrank_type = "rookPivoting", 
                   bool is_sym = false, bool is_pd = false
                  );
     Mat matmatProduct(Mat x);

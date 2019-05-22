@@ -18,7 +18,7 @@ HODLR_Node::HODLR_Node(int level_number, int node_number, int local_number,
     this->tolerance    = tolerance;
 }
 
-void HODLR_Node::assembleLeafNode(HODLR_Matrix* A) 
+void HODLR_Node::assembleLeafNode(Matrix* A) 
 {
     // At the leaf level we are just going to be building the matrix
     // directly since it's a full rank block:

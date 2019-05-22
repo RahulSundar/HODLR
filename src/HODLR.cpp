@@ -82,7 +82,7 @@ void HODLR::createTree()
 // That is:
 // For leaf nodes, it directly evaluates the matrix entries:
 // For nonleaf nodes, it gets the low rank representation of the underlying matrix:
-void HODLR::assemble(HODLR_Matrix* A, std::string lowrank_type, bool is_sym, bool is_pd) 
+void HODLR::assemble(Matrix* A, std::string lowrank_type, bool is_sym, bool is_pd) 
 {
     this->F      = new LowRank(A, lowrank_type);
     this->is_sym = is_sym;

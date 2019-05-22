@@ -8,7 +8,7 @@ x = np.sort(np.random.rand(N))
 M = 200
 
 # Returning the Gaussian Kernel:
-class Kernel(pyhodlrlib.HODLR_Matrix):
+class Kernel(pyhodlrlib.Matrix):
     def getMatrixEntry(self, i, j):
         if(i == j):
             return 10

@@ -1,11 +1,11 @@
 // File used in CI testing
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "KDTree.hpp"
 #include "HODLR.hpp"
 
-// Derived class of HODLR_Matrix which is ultimately
+// Derived class of Matrix which is ultimately
 // passed to the HODLR_Tree class:
-class Kernel_Gaussian : public HODLR_Matrix 
+class Kernel_Gaussian : public Matrix 
 {
 
 private:
@@ -14,7 +14,7 @@ private:
 public:
 
     // Constructor:
-    explicit Kernel_Gaussian(int N, int dim) : HODLR_Matrix(N) 
+    explicit Kernel_Gaussian(int N, int dim) : Matrix(N) 
     {
         x = (Mat::Random(N, dim)).real();
         // This is being sorted to ensure that we get
@@ -52,7 +52,7 @@ public:
     ~Kernel_Gaussian() {};
 };
 
-class Random_Matrix : public HODLR_Matrix 
+class Random_Matrix : public Matrix 
 {
 
 private:
@@ -61,7 +61,7 @@ private:
 public:
 
     // Constructor:
-    explicit Random_Matrix(int N) : HODLR_Matrix(N) 
+    explicit Random_Matrix(int N) : Matrix(N) 
     {
         x = (Mat::Random(N, N)).real().cwiseAbs();
         x = 0.5 * (x + x.transpose());
@@ -79,8 +79,8 @@ public:
     ~Random_Matrix() {};
 };
 
-template<class HODLR_Matrix>
-void testHODLR(int N, int M, double tolerance, HODLR_Matrix* K, std::string lowrank_method, std::string image_name)
+template<class Matrix>
+void testHODLR(int N, int M, double tolerance, Matrix* K, std::string lowrank_method, std::string image_name)
 {
     // Througout, we have ensured that the error in the method is lesser than 
     // N X tolerance that was requested for ACA. It is not always necessary
@@ -173,8 +173,8 @@ int main(int argc, char* argv[])
     // Tolerance of problem
     double tolerance = pow(10, -12);
 
-    // Dummy check to ensure that zeros are returned when HODLR_Matrix is directly used:
-    HODLR_Matrix* K_dummy = new HODLR_Matrix(N);
+    // Dummy check to ensure that zeros are returned when Matrix is directly used:
+    Matrix* K_dummy = new Matrix(N);
     assert(K_dummy->getMatrixEntry(rand() % N, rand() % N) == 0);
     delete K_dummy;
 

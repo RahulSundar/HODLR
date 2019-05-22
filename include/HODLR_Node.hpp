@@ -2,7 +2,7 @@
 #define __HODLR_Node__
 
 #include <Eigen/Dense>
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "LowRank.hpp"
 
 class HODLR_Node 
@@ -37,7 +37,7 @@ private:
     Eigen::LLT<Mat> K_factor_LLT;
 
     // Methods for Leaf Nodes:
-    void assembleLeafNode(HODLR_Matrix* A);
+    void assembleLeafNode(Matrix* A);
     void matmatProductLeaf(Mat x, Mat& b);
 
     // Methods for Non-leaf Nodes:

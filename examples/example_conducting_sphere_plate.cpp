@@ -1,4 +1,4 @@
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "HODLR.hpp"
 
 using std::setprecision;
@@ -11,13 +11,13 @@ using std::setprecision;
 // [1] Giuseppe Bimonte, Classical Casimir interaction of a perfectly
 //     conducting sphere and plate, Phys. Rev. D 95, 065004 (2017)
 //     https://doi.org/10.1103/PhysRevD.95.065004
-class kernel : public HODLR_Matrix 
+class kernel : public Matrix 
 {
 private:
     double y;
 
 public:
-    kernel(unsigned N, double RbyL) : HODLR_Matrix(N) 
+    kernel(unsigned N, double RbyL) : Matrix(N) 
     {
         // y = 0.5*R/(R+L) 
         this->y = log(0.5/(1+1./RbyL));

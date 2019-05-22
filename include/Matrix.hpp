@@ -1,5 +1,5 @@
-#ifndef __HODLR_Matrix__
-#define __HODLR_Matrix__
+#ifndef __Matrix__
+#define __Matrix__
 
 #ifdef MKL_ENABLED
     #define EIGEN_USE_MKL_ALL
@@ -44,7 +44,7 @@
     const std::complex<double> I(0.0, 1.0);
 #endif
 
-class HODLR_Matrix 
+class Matrix 
 {
 public:
 
@@ -60,7 +60,7 @@ public:
     }
 
     // Constructor:
-    explicit HODLR_Matrix(int N)
+    explicit Matrix(int N)
     {
         this->N = N;
     }
@@ -81,7 +81,7 @@ public:
     Mat getMatrix(int j, int k, int n_rows, int n_cols);
 
     // Destructor:
-    ~HODLR_Matrix() {};
+    ~Matrix() {};
 };
 
-#endif /*__HODLR_Matrix__*/
+#endif /*__Matrix__*/

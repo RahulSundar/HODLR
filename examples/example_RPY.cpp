@@ -1,4 +1,4 @@
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 #include "KDTree.hpp"
 #include "HODLR.hpp"
 
@@ -7,7 +7,7 @@
 // RPY Tensor:
 // K(r) = ((kT) / (6πηa))     * ((1 - 9 * ||r|| / (32a))I + 3 / (32a) (r ⊗ r) / ||r|| if ||r|| <  2a
 // K(r) = ((kT) / (8πη||r||)) * (I + (r ⊗ r) / ||r|| + (2a**2 / 3||r||**2) * (I - 3 (r ⊗ r) / ||r||))  if ||r|| >= 2a
-class Kernel : public HODLR_Matrix 
+class Kernel : public Matrix 
 {
 
 private:
@@ -18,7 +18,7 @@ private:
 public:
 
     // Constructor:
-    Kernel(int N, int dim, double k, double T, double eta) : HODLR_Matrix(dim * N) 
+    Kernel(int N, int dim, double k, double T, double eta) : Matrix(dim * N) 
     {
         x         = (Mat::Random(N, dim)).real();
         this->dim = dim;
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
         tolerance  = pow(10, -atoi(argv[4]));
     }
 
-    // Declaration of HODLR_Matrix object that abstracts data in Matrix:
+    // Declaration of Matrix object that abstracts data in Matrix:
     // Setting k = T = η = 1
     Kernel* K = new Kernel(N, dim, 1, 1, 1);
 

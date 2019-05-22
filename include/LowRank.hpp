@@ -2,7 +2,7 @@
 #define __LowRank__
 
 #include <Eigen/Dense>
-#include "HODLR_Matrix.hpp"
+#include "Matrix.hpp"
 
 class LowRank
 {
@@ -40,7 +40,7 @@ private:
 
 public:
 
-    HODLR_Matrix* A;
+    Matrix* A;
     // Global size of the matrix:
     int N;
     // Type for the factorization:
@@ -49,7 +49,7 @@ public:
     Mat L, R;
 
     // Constructor:
-    LowRank(HODLR_Matrix* A, std::string type = "rookPivoting")
+    LowRank(Matrix* A, std::string type = "rookPivoting")
     {
         this->type = type;
         this->A    = A;
