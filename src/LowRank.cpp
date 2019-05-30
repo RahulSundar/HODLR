@@ -683,6 +683,31 @@ void LowRank::RRQR(Mat& L,  Mat& R, double tolerance_or_rank,
         * Mat(rrqr.matrixQR().triangularView<Eigen::Upper>()).block(0, 0, rank, n_cols).transpose();
 }
 
+void LowRank::interpolation(Mat& L,  Mat& R, double tolerance_or_rank,
+                            int n_row_start, int n_col_start, 
+                            int n_rows, int n_cols
+                           )
+{
+    Mat temp = this->A->getMatrix(n_row_start, n_col_start, n_rows, n_cols);
+    Eigen::ColPivHouseholderQR<Mat> rrqr(temp);
+
+    int rank;
+    if(tolerance_or_rank < 1)
+    {
+        rrqr.setThreshold(tolerance_or_rank);
+        rank = rrqr.rank();
+    }
+
+    else
+    {
+        rank = int(tolerance_or_rank);
+    }
+
+    L = Mat(rrqr.matrixQ()).block(0, 0, n_rows, rank);
+    R =   Mat(rrqr.colsPermutation()).block(0, 0, n_cols, n_cols)
+        * Mat(rrqr.matrixQR().triangularView<Eigen::Upper>()).block(0, 0, rank, n_cols).transpose();
+}
+
 void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
                                int n_row_start, int n_col_start, 
                                int n_rows, int n_cols
