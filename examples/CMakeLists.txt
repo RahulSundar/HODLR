@@ -5,6 +5,7 @@ foreach(TARGET
         example_RPY 
         example_matern 
         example_conducting_sphere_plate
+        example_interpolation
        )
 
   add_executable(${TARGET} 

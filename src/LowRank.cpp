@@ -683,25 +683,105 @@ void LowRank::RRQR(Mat& L,  Mat& R, double tolerance_or_rank,
         * Mat(rrqr.matrixQR().triangularView<Eigen::Upper>()).block(0, 0, rank, n_cols).transpose();
 }
 
-void LowRank::interpolation(Mat& L,  Mat& R, double tolerance_or_rank,
+// Gives the interpolation operator / L2L for 1D:
+// void getL2L1DAF(array x, array x_nodes, array &L2L)
+// {
+//     // Size is the number of points in x
+//     // Rank is the number of points in x_nodes
+//     unsigned rank = x_nodes.elements();
+
+//     // Tiling x       to bring it to shape (size, rank)
+//     // Tiling x_nodes to bring it to shape (rank, rank)
+//     // We will be using x_nodes to get the denominator for 
+//     // the lagrange polynomials i.e. Π(x_i - x_j) where i != j
+//     // Similarly, we will be using x to get the numerator for
+//     // the lagrange polynomials i.e. num(P_i) = Π(x - x_j) where i =! j 
+//     x       = af::tile(x, 1, rank);
+//     x_nodes = af::tile(x_nodes, 1, rank);
+
+//     // Allowing broadcasting:
+//     af::gforSet(true);
+//     x       = x       - x_nodes(af::span, 0).T();
+//     x_nodes = x_nodes - x_nodes(af::span, 0).T();
+//     af::gforSet(false);
+
+//     // Performing Π(x_i - x_j) where i != j
+//     x_nodes = af::product(af::select(x_nodes == 0, 1, x_nodes), 1);
+
+//     // temp is used to get num(P_i) = Π(x - x_j) where i =! j
+//     array temp;
+
+//     // DO NOT USE GFOR HERE! THROWS WRONG RESULTS!
+//     for(int i = 0; i < x_nodes.dims(0); i++)
+//     {
+//         temp        = x;
+//         temp.col(i) = 1;
+//         L2L.col(i)  = af::product(temp, 1);
+//     }
+
+//     // Allowing broadcasting:
+//     af::gforSet(true);
+//     L2L = L2L / x_nodes.T();
+//     af::gforSet(false);
+
+//     L2L.eval();
+// }
+
+
+// void LowRank::getM2LAF(Mat& M2L)
+// {
+//     M2L = Mat(N_nodes, N_nodes);
+//     for(int i = 0; i < N_nodes; i++)
+//     {
+//         for(int j = 0; j < N_nodes; j++)
+//         {
+//             M2L(i, j) = this->A->getMatrix
+//         }
+//     }
+
+//     // Evaluating the Kernel function at the nodes:
+//     M2L = this->A->getMatrix(n_row_start, n_col_start, n_rows, n_cols);
+// }
+
+void LowRank::interpolation(Mat& L,  Mat& R, int rank,
                             int n_row_start, int n_col_start, 
                             int n_rows, int n_cols
                            )
 {
+    if(rank < 1)
+    {
+        std::cout << "Invalid option for interpolation. Rank needs to be explicitly mentioned" << std::endl;
+        exit(1);
+    }
+
+    // // Determining the center and radius of targets:
+    // determineCenterAndRadius(target_coords, c_targets, r_targets);
+    // // Determining the center and radius of sources:
+    // determineCenterAndRadius(source_coords, c_sources, r_sources);
+
+    // // Obtain the scaled Chebyshev nodes for the targets:
+    // array nodes_targets, nodes_sources;
+
+    // scalePoints(0, 1, standard_nodes, c_targets, r_targets, nodes_targets);
+    // scalePoints(0, 1, standard_nodes, c_sources, r_sources, nodes_sources);
+
+    // // Standard Locations of the coordinates:
+    // array standard_targets, standard_sources;
+    // scalePoints(c_targets, r_targets, target_coords, 0, 1, standard_targets);
+    // scalePoints(c_sources, r_sources, source_coords, 0, 1, standard_sources);
+
+    // // Initializing U, S, V:
+    // U = af::constant(0, M.getNumRows(), n_nodes, f64);
+    // S = array(n_nodes, n_nodes, f64);
+    // V = af::constant(0, M.getNumCols(), n_nodes, f64);
+
+    // getL2L1DAF(standard_targets, standard_nodes, U);
+    // getM2LAF(nodes_targets, nodes_sources, M, S);
+    // getL2L1D(standard_sources, standard_nodes, V);
+
+    // int N_nodes = tolerance;
     Mat temp = this->A->getMatrix(n_row_start, n_col_start, n_rows, n_cols);
     Eigen::ColPivHouseholderQR<Mat> rrqr(temp);
-
-    int rank;
-    if(tolerance_or_rank < 1)
-    {
-        rrqr.setThreshold(tolerance_or_rank);
-        rank = rrqr.rank();
-    }
-
-    else
-    {
-        rank = int(tolerance_or_rank);
-    }
 
     L = Mat(rrqr.matrixQ()).block(0, 0, n_rows, rank);
     R =   Mat(rrqr.colsPermutation()).block(0, 0, n_cols, n_cols)

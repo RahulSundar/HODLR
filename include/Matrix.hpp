@@ -52,6 +52,10 @@ public:
 
     // Size of the matrix:
     int N;
+    // Checks if we are dealing with an interpolation matrix:
+    bool is_interp;
+    // These would be declared when performing lowrank using interpolation:
+    Mat x, y;
 
     // Modulo operator:
     // This is separately defined to make sure 
@@ -64,23 +68,28 @@ public:
     // Constructor:
     explicit Matrix(int N)
     {
-        this->N = N;
+        this->N         = N;
+        this->is_interp = true;
     }
 
     // Returns individual entries of the matrix:
     virtual dtype getMatrixEntry(int j, int k) 
     {
-        // FROM EXPERIENCE: Incase the user makes a mistake in 
-        // setting the derived class, this warns the user:
-        std::cout << "Returning zero! Ensure that derived class is properly set!" << std::endl;
-        return 0.0;
+        return -1.0;
     }
 
-    Vec getRow(int j, int n_col_start, int n_cols);
-    Vec getCol(int k, int n_row_start, int n_rows);
-    Vec getDiag1(int j, int k, int n_rows, int n_cols);
-    Vec getDiag2(int j, int k, int n_rows, int n_cols);
-    Mat getMatrix(int j, int k, int n_rows, int n_cols);
+    // Returns individual entries of the matrix, when entries are a function of x, y:
+    virtual dtype getMatrixEntry(Mat x, Mat y, int i, int j) 
+    {
+        this->is_interp = false;
+        return -1.0;
+    }
+
+    Vec getRow(int j, int n_col_start, int n_cols, Mat x = Mat::Zeros(1, 1), Mat y = Mat::Zeros(1, 1));
+    Vec getCol(int k, int n_row_start, int n_rows, Mat x = Mat::Zeros(1, 1), Mat y = Mat::Zeros(1, 1));
+    Vec getDiag1(int j, int k, int n_rows, int n_cols, Mat x = Mat::Zeros(1, 1), Mat y = Mat::Zeros(1, 1));
+    Vec getDiag2(int j, int k, int n_rows, int n_cols, Mat x = Mat::Zeros(1, 1), Mat y = Mat::Zeros(1, 1));
+    Mat getMatrix(int j, int k, int n_rows, int n_cols, Mat x = Mat::Zeros(1, 1), Mat y = Mat::Zeros(1, 1));
 
     // Destructor:
     ~Matrix() {};

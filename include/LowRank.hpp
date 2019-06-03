@@ -38,13 +38,20 @@ private:
               int n_rows, int n_cols
              );
 
+    void interpolation(Mat& L,  Mat& R, int rank,
+                       int n_row_start, int n_col_start, 
+                       int n_rows, int n_cols
+                      );
+
 public:
 
     Matrix* A;
-    // Global size of the matrix:
-    int N;
+    // Global size of the matrix and number of nodes (used if method of choice is interpolation):
+    int N, N_nodes;
     // Type for the factorization:
     std::string type;
+    // The following variables will be used when method used is interpolation:
+    Vec x_start, x_end, y_start, y_end, x_nodes, y_nodes;
     // Matrices in which the factorization is stored
     Mat L, R;
 
