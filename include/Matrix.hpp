@@ -69,12 +69,12 @@ public:
         this->N         = N;
     }
 
-    Vec getX()
+    virtual Vec getX()
     {
         return x;
     }
 
-    Vec getY()
+    virtual Vec getY()
     {
         return y;
     }
