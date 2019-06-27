@@ -1,6 +1,6 @@
 #include "Matrix.hpp"
-#include "LowRank.hpp"
-#include "Interpolation.hpp"
+// #include "LowRank.hpp"
+// #include "Interpolation.hpp"
 
 // Derived class of Matrix which is ultimately
 // passed to the HODLR_Tree class:
@@ -15,16 +15,6 @@ public:
         x = 2 * Mat::Ones(N, 1) + Mat::Random(N, 1);
         y = 7 * Mat::Ones(N, 1) + Mat::Random(N, 1);
     };
-    
-    dtype getX(int i)
-    {
-        return x(i);
-    }
-
-    dtype getY(int j)
-    {
-        return y(j);
-    }
 
     dtype getMatrixEntry(Mat x, Mat y, int i, int j) 
     {
@@ -42,7 +32,7 @@ int main(int argc, char* argv[])
     // LowRank* F = new LowRank(K, "rookPivoting");
 
     Mat B = K->getMatrix(0, 0, 5, 5);
-    Mat L, R, error;
+    // Mat L, R, error;
     std::cout << B << std::endl;
 
     // F->getFactorization(L, R, 1e-12);
