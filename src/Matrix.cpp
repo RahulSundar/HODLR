@@ -2,6 +2,12 @@
 
 Vec Matrix::getRow(const int j, const int n_col_start, const int n_cols, Mat x, Mat y) 
 {
+    if(x.size() == 0 && y.size() == 0)
+    {
+        x = this->getX();
+        y = this->getY();
+    }
+
     Vec row(n_cols);
 
     #pragma omp parallel for
@@ -15,6 +21,12 @@ Vec Matrix::getRow(const int j, const int n_col_start, const int n_cols, Mat x, 
 
 Vec Matrix::getCol(const int k, const int n_row_start, const int n_rows, Mat x, Mat y) 
 {
+    if(x.size() == 0 && y.size() == 0)
+    {
+        x = this->getX();
+        y = this->getY();
+    }
+
     Vec col(n_rows);
 
     #pragma omp parallel for
@@ -29,6 +41,12 @@ Vec Matrix::getCol(const int k, const int n_row_start, const int n_rows, Mat x, 
 Vec Matrix::getDiag1(const int n_row_start, const int n_col_start, 
                      const int n_rows, const int n_cols, Mat x, Mat y) 
 {
+    if(x.size() == 0 && y.size() == 0)
+    {
+        x = this->getX();
+        y = this->getY();
+    }
+
     int N = std::max(n_rows, n_cols);
     Vec diag(N);
 
@@ -57,9 +75,15 @@ Vec Matrix::getDiag1(const int n_row_start, const int n_col_start,
 Vec Matrix::getDiag2(const int n_row_start, const int n_col_start, 
                      const int n_rows, const int n_cols, Mat x, Mat y) 
 {
+    if(x.size() == 0 && y.size() == 0)
+    {
+        x = this->getX();
+        y = this->getY();
+    }
+
     int N = std::max(n_rows, n_cols);
     Vec diag(N);
-    
+
     int row_ind, col_ind;
     #pragma omp parallel for
     for (int j = 0; j < N; ++j) 
@@ -86,7 +110,12 @@ Mat Matrix::getMatrix(const int n_row_start, const int n_col_start,
                       const int n_rows, const int n_cols, Mat x, Mat y) 
 {
     Mat mat(n_rows, n_cols);
-    
+    if(x.size() == 0 && y.size() == 0)
+    {
+        x = this->getX();
+        y = this->getY();
+    }
+
     #pragma omp parallel for
     for (int j=0; j < n_rows; ++j) 
     {

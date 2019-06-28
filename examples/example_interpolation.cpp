@@ -1,6 +1,5 @@
 #include "Matrix.hpp"
-// #include "LowRank.hpp"
-// #include "Interpolation.hpp"
+#include "LowRank.hpp"
 
 // Derived class of Matrix which is ultimately
 // passed to the HODLR_Tree class:
@@ -16,7 +15,17 @@ public:
         y = 7 * Mat::Ones(N, 1) + Mat::Random(N, 1);
     };
 
-    dtype getMatrixEntry(Mat x, Mat y, int i, int j) 
+    Mat getX() override
+    {
+        return this->x;
+    }
+
+    Mat getY() override
+    {
+        return this->y;
+    }
+
+    dtype getMatrixEntryXY(Mat x, Mat y, int i, int j) override
     {
         return 1 / abs((x(i)-y(j)));
     }
@@ -27,15 +36,17 @@ public:
 
 int main(int argc, char* argv[]) 
 {
+    // Size of the Matrix:
+    int N = 100;
+
     // Declaration of Matrix object that abstracts data in Matrix:
-    Kernel* K  = new Kernel(5);
-    // LowRank* F = new LowRank(K, "rookPivoting");
+    Kernel* K  = new Kernel(N);
+    LowRank* F = new LowRank(K, "rookPivoting");
 
-    Mat B = K->getMatrix(0, 0, 5, 5);
-    // Mat L, R, error;
-    std::cout << B << std::endl;
+    Mat B = K->getMatrix(0, 0, N, N);
+    Mat L, R, error;
 
-    // F->getFactorization(L, R, 1e-12);
-    // error = B - L * R.transpose();
-    // std::cout << "Accuracy of Factorization using Rook Pivoting:" << error.cwiseAbs().maxCoeff() << std::endl;
+    F->getFactorization(L, R, 1e-12);
+    error = B - L * R.transpose();
+    std::cout << "Accuracy of Factorization using Rook Pivoting:" << error.cwiseAbs().maxCoeff() << std::endl;
 }

@@ -1,4 +1,5 @@
 #include "LowRank.hpp"
+#include "utils/determine"
  
 void LowRank::maxAbsVector(const Vec& v, 
                            const std::set<int>& allowed_indices,
@@ -743,7 +744,7 @@ void LowRank::RRQR(Mat& L,  Mat& R, double tolerance_or_rank,
 //     M2L = this->A->getMatrix(n_row_start, n_col_start, n_rows, n_cols);
 // }
 
-void LowRank::interpolation(Mat& L,  Mat& R, int rank,
+void LowRank::interpolation(Mat& U,  Mat& S, Mat& V, int rank,
                             int n_row_start, int n_col_start, 
                             int n_rows, int n_cols
                            )
@@ -754,38 +755,29 @@ void LowRank::interpolation(Mat& L,  Mat& R, int rank,
         exit(1);
     }
 
-    // // Determining the center and radius of targets:
-    // determineCenterAndRadius(target_coords, c_targets, r_targets);
-    // // Determining the center and radius of sources:
-    // determineCenterAndRadius(source_coords, c_sources, r_sources);
+    // Determining the center and radius of targets:
+    determineCenterAndRadius(this->K->getX(), c_targets, r_targets);
+    // Determining the center and radius of sources:
+    determineCenterAndRadius(this->K->getY(), c_sources, r_sources);
 
-    // // Obtain the scaled Chebyshev nodes for the targets:
-    // array nodes_targets, nodes_sources;
+    // Obtain the scaled Chebyshev nodes for the targets:
+    Mat nodes_targets, nodes_sources;
+    scalePoints(0, 1, standard_nodes, c_targets, r_targets, nodes_targets);
+    scalePoints(0, 1, standard_nodes, c_sources, r_sources, nodes_sources);
 
-    // scalePoints(0, 1, standard_nodes, c_targets, r_targets, nodes_targets);
-    // scalePoints(0, 1, standard_nodes, c_sources, r_sources, nodes_sources);
+    // Standard Locations of the coordinates:
+    array standard_targets, standard_sources;
+    scalePoints(c_targets, r_targets, target_coords, 0, 1, standard_targets);
+    scalePoints(c_sources, r_sources, source_coords, 0, 1, standard_sources);
 
-    // // Standard Locations of the coordinates:
-    // array standard_targets, standard_sources;
-    // scalePoints(c_targets, r_targets, target_coords, 0, 1, standard_targets);
-    // scalePoints(c_sources, r_sources, source_coords, 0, 1, standard_sources);
+    // Initializing U, S, V:
+    U = Mat(n_rows, rank);
+    S = Mat(rank, rank);
+    V = Mat(n_cols, rank);
 
-    // // Initializing U, S, V:
-    // U = af::constant(0, M.getNumRows(), n_nodes, f64);
-    // S = array(n_nodes, n_nodes, f64);
-    // V = af::constant(0, M.getNumCols(), n_nodes, f64);
-
-    // getL2L1DAF(standard_targets, standard_nodes, U);
-    // getM2LAF(nodes_targets, nodes_sources, M, S);
-    // getL2L1D(standard_sources, standard_nodes, V);
-
-    // int N_nodes = tolerance;
-    Mat temp = this->A->getMatrix(n_row_start, n_col_start, n_rows, n_cols);
-    Eigen::ColPivHouseholderQR<Mat> rrqr(temp);
-
-    L = Mat(rrqr.matrixQ()).block(0, 0, n_rows, rank);
-    R =   Mat(rrqr.colsPermutation()).block(0, 0, n_cols, n_cols)
-        * Mat(rrqr.matrixQR().triangularView<Eigen::Upper>()).block(0, 0, rank, n_cols).transpose();
+    getL2L1DAF(standard_targets, standard_nodes, U);
+    getM2LAF(nodes_targets, nodes_sources, M, S);
+    getL2L1D(standard_sources, standard_nodes, V);
 }
 
 void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
@@ -838,6 +830,18 @@ void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
              n_row_start, n_col_start, 
              n_rows, n_cols
             );
+    }
+
+    else if(this->type.compare("interpolation1d") == 0)
+    {   
+        Mat U, S, V;
+        interpolation1d(U, S, V, int(tolerance_or_rank),
+                        n_row_start, n_col_start, 
+                        n_rows, n_cols
+                       );
+    
+        L = U * S;
+        R = V;
     }
 
     else

@@ -43,7 +43,6 @@ Mat getL2L1D(Vec x, Vec x_nodes)
         L2L.col(i)  = temp.rowwise().prod();
     }
 
-    // Allowing broadcasting:
     #pragma omp parallel for
     for(int i = 0; i < rank; i++)
     {
@@ -58,4 +57,36 @@ Mat getM2L(Mat &nodes_1, array &nodes_2, Matrix* M)
     // Evaluating the Kernel function at the interpolation nodes:
     Mat M2L = M->getMatrix(0, 0, nodes_1.size(), nodes_2.size(), nodes_1, nodes_2);
     return M2L;
+}
+
+void getInterpolation()
+{
+    if(M.getDimensionality() == 1)
+    {
+        double c_targets, r_targets, c_sources, r_sources;
+        // Determining the center and radius of targets:
+        determineCenterAndRadius(target_coords, c_targets, r_targets);
+        // Determining the center and radius of sources:
+        determineCenterAndRadius(source_coords, c_sources, r_sources);
+
+        // Obtain the scaled Chebyshev nodes for the targets:
+        array nodes_targets, nodes_sources;
+
+        scalePoints(0, 1, standard_nodes, c_targets, r_targets, nodes_targets);
+        scalePoints(0, 1, standard_nodes, c_sources, r_sources, nodes_sources);
+
+        // Standard Locations of the coordinates:
+        array standard_targets, standard_sources;
+        scalePoints(c_targets, r_targets, target_coords, 0, 1, standard_targets);
+        scalePoints(c_sources, r_sources, source_coords, 0, 1, standard_sources);
+    
+        // Initializing U, S, V:
+        U = af::constant(0, M.getNumRows(), n_nodes, f64);
+        S = array(n_nodes, n_nodes, f64);
+        V = af::constant(0, M.getNumCols(), n_nodes, f64);
+
+        getL2L1DAF(standard_targets, standard_nodes, U);
+        getM2LAF(nodes_targets, nodes_sources, M, S);
+        getL2L1D(standard_sources, standard_nodes, V);
+    }
 }

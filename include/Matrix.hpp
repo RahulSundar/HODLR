@@ -69,12 +69,12 @@ public:
         this->N         = N;
     }
 
-    virtual Vec getX()
+    virtual Mat getX()
     {
         return x;
     }
 
-    virtual Vec getY()
+    virtual Mat getY()
     {
         return y;
     }
@@ -91,11 +91,11 @@ public:
         return getMatrixEntry(i, j);
     }
 
-    Vec getRow(int j, int n_col_start, int n_cols, Mat x = Mat::Zero(1, 1), Mat y = Mat::Zero(1, 1));
-    Vec getCol(int k, int n_row_start, int n_rows, Mat x = Mat::Zero(1, 1), Mat y = Mat::Zero(1, 1));
-    Vec getDiag1(int j, int k, int n_rows, int n_cols, Mat x = Mat::Zero(1, 1), Mat y = Mat::Zero(1, 1));
-    Vec getDiag2(int j, int k, int n_rows, int n_cols, Mat x = Mat::Zero(1, 1), Mat y = Mat::Zero(1, 1));
-    Mat getMatrix(int j, int k, int n_rows, int n_cols, Mat x = Mat::Zero(1, 1), Mat y = Mat::Zero(1, 1));
+    Vec getRow(int j, int n_col_start, int n_cols, Mat x = Mat(), Mat y = Mat());
+    Vec getCol(int k, int n_row_start, int n_rows, Mat x = Mat(), Mat y = Mat());
+    Vec getDiag1(int j, int k, int n_rows, int n_cols, Mat x = Mat(), Mat y = Mat());
+    Vec getDiag2(int j, int k, int n_rows, int n_cols, Mat x = Mat(), Mat y = Mat());
+    Mat getMatrix(int j, int k, int n_rows, int n_cols, Mat x = Mat(), Mat y = Mat());
 
     // Destructor:
     ~Matrix() {};
