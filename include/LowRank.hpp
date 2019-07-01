@@ -38,10 +38,10 @@ private:
               int n_rows, int n_cols
              );
 
-    void interpolation(Mat& L,  Mat& R, int rank,
-                       int n_row_start, int n_col_start, 
-                       int n_rows, int n_cols
-                      );
+    void interpolation1d(Mat& U, Mat& S, Mat& V, int rank,
+                         int n_row_start, int n_col_start, 
+                         int n_rows, int n_cols
+                        );
 
 public:
 

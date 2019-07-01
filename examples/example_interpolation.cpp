@@ -37,16 +37,16 @@ public:
 int main(int argc, char* argv[]) 
 {
     // Size of the Matrix:
-    int N = 100;
+    int N = 10;
 
     // Declaration of Matrix object that abstracts data in Matrix:
     Kernel* K  = new Kernel(N);
-    LowRank* F = new LowRank(K, "rookPivoting");
+    LowRank* F = new LowRank(K, "interpolation1d");
 
     Mat B = K->getMatrix(0, 0, N, N);
     Mat L, R, error;
 
-    F->getFactorization(L, R, 1e-12);
+    F->getFactorization(L, R, 3);
     error = B - L * R.transpose();
     std::cout << "Accuracy of Factorization using Rook Pivoting:" << error.cwiseAbs().maxCoeff() << std::endl;
 }

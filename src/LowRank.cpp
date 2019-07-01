@@ -1,6 +1,9 @@
 #include "LowRank.hpp"
-#include "utils/determine"
- 
+#include "utils/getStandardNodes.hpp"
+#include "utils/determineCenterAndRadius.hpp"
+#include "utils/scalePoints.hpp"
+#include "utils/interpolation.hpp"
+
 void LowRank::maxAbsVector(const Vec& v, 
                            const std::set<int>& allowed_indices,
                            dtype& max, int& index
@@ -684,70 +687,10 @@ void LowRank::RRQR(Mat& L,  Mat& R, double tolerance_or_rank,
         * Mat(rrqr.matrixQR().triangularView<Eigen::Upper>()).block(0, 0, rank, n_cols).transpose();
 }
 
-// Gives the interpolation operator / L2L for 1D:
-// void getL2L1DAF(array x, array x_nodes, array &L2L)
-// {
-//     // Size is the number of points in x
-//     // Rank is the number of points in x_nodes
-//     unsigned rank = x_nodes.elements();
-
-//     // Tiling x       to bring it to shape (size, rank)
-//     // Tiling x_nodes to bring it to shape (rank, rank)
-//     // We will be using x_nodes to get the denominator for 
-//     // the lagrange polynomials i.e. Π(x_i - x_j) where i != j
-//     // Similarly, we will be using x to get the numerator for
-//     // the lagrange polynomials i.e. num(P_i) = Π(x - x_j) where i =! j 
-//     x       = af::tile(x, 1, rank);
-//     x_nodes = af::tile(x_nodes, 1, rank);
-
-//     // Allowing broadcasting:
-//     af::gforSet(true);
-//     x       = x       - x_nodes(af::span, 0).T();
-//     x_nodes = x_nodes - x_nodes(af::span, 0).T();
-//     af::gforSet(false);
-
-//     // Performing Π(x_i - x_j) where i != j
-//     x_nodes = af::product(af::select(x_nodes == 0, 1, x_nodes), 1);
-
-//     // temp is used to get num(P_i) = Π(x - x_j) where i =! j
-//     array temp;
-
-//     // DO NOT USE GFOR HERE! THROWS WRONG RESULTS!
-//     for(int i = 0; i < x_nodes.dims(0); i++)
-//     {
-//         temp        = x;
-//         temp.col(i) = 1;
-//         L2L.col(i)  = af::product(temp, 1);
-//     }
-
-//     // Allowing broadcasting:
-//     af::gforSet(true);
-//     L2L = L2L / x_nodes.T();
-//     af::gforSet(false);
-
-//     L2L.eval();
-// }
-
-
-// void LowRank::getM2LAF(Mat& M2L)
-// {
-//     M2L = Mat(N_nodes, N_nodes);
-//     for(int i = 0; i < N_nodes; i++)
-//     {
-//         for(int j = 0; j < N_nodes; j++)
-//         {
-//             M2L(i, j) = this->A->getMatrix
-//         }
-//     }
-
-//     // Evaluating the Kernel function at the nodes:
-//     M2L = this->A->getMatrix(n_row_start, n_col_start, n_rows, n_cols);
-// }
-
-void LowRank::interpolation(Mat& U,  Mat& S, Mat& V, int rank,
-                            int n_row_start, int n_col_start, 
-                            int n_rows, int n_cols
-                           )
+void LowRank::interpolation1d(Mat& U,  Mat& S, Mat& V, int rank,
+                              int n_row_start, int n_col_start, 
+                              int n_rows, int n_cols
+                             )
 {
     if(rank < 1)
     {
@@ -755,29 +698,29 @@ void LowRank::interpolation(Mat& U,  Mat& S, Mat& V, int rank,
         exit(1);
     }
 
+    // Get the nodes for the standard interval [-1, 1]
+    Mat standard_nodes = getStandardNodes(rank, "CHEBYSHEV");
+
+    double c_targets, r_targets, c_sources, r_sources;
     // Determining the center and radius of targets:
-    determineCenterAndRadius(this->K->getX(), c_targets, r_targets);
+    determineCenterAndRadius(this->A->getX(), c_targets, r_targets);
     // Determining the center and radius of sources:
-    determineCenterAndRadius(this->K->getY(), c_sources, r_sources);
+    determineCenterAndRadius(this->A->getY(), c_sources, r_sources);
 
     // Obtain the scaled Chebyshev nodes for the targets:
     Mat nodes_targets, nodes_sources;
-    scalePoints(0, 1, standard_nodes, c_targets, r_targets, nodes_targets);
-    scalePoints(0, 1, standard_nodes, c_sources, r_sources, nodes_sources);
+    nodes_targets = scalePoints(0, 1, standard_nodes, c_targets, r_targets);
+    nodes_sources = scalePoints(0, 1, standard_nodes, c_sources, r_sources);
 
     // Standard Locations of the coordinates:
-    array standard_targets, standard_sources;
-    scalePoints(c_targets, r_targets, target_coords, 0, 1, standard_targets);
-    scalePoints(c_sources, r_sources, source_coords, 0, 1, standard_sources);
+    Mat standard_targets, standard_sources;
+    standard_targets = scalePoints(c_targets, r_targets, this->A->getX(), 0, 1);
+    standard_sources = scalePoints(c_sources, r_sources, this->A->getY(), 0, 1);
 
-    // Initializing U, S, V:
-    U = Mat(n_rows, rank);
-    S = Mat(rank, rank);
-    V = Mat(n_cols, rank);
-
-    getL2L1DAF(standard_targets, standard_nodes, U);
-    getM2LAF(nodes_targets, nodes_sources, M, S);
-    getL2L1D(standard_sources, standard_nodes, V);
+    // Getting U, S, V:
+    U = getL2L1D(standard_targets, standard_nodes);
+    S = getM2L(nodes_targets, nodes_sources, this->A);
+    V = getL2L1D(standard_sources, standard_nodes);
 }
 
 void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
@@ -839,7 +782,11 @@ void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
                         n_row_start, n_col_start, 
                         n_rows, n_cols
                        );
-    
+
+        std::cout << U << std::endl;
+        std::cout << S << std::endl;
+        std::cout << V << std::endl;
+
         L = U * S;
         R = V;
     }
