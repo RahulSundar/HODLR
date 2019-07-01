@@ -783,10 +783,6 @@ void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
                         n_rows, n_cols
                        );
 
-        std::cout << U << std::endl;
-        std::cout << S << std::endl;
-        std::cout << V << std::endl;
-
         L = U * S;
         R = V;
     }

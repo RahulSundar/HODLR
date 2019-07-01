@@ -32,7 +32,7 @@ Mat getL2L1D(Vec x, Vec x_nodes)
     }
     
     // Performing Π(x_i - x_j) where i != j
-    x_nodes_temp = x_nodes_temp.colwise().prod();
+    Mat prod = x_nodes_temp.colwise().prod();
     // temp is used to get num(P_i) = Π(x - x_j) where i =! j
     Mat temp;
 
@@ -43,10 +43,11 @@ Mat getL2L1D(Vec x, Vec x_nodes)
         L2L.col(i)  = temp.rowwise().prod();
     }
 
+
     #pragma omp parallel for
     for(int i = 0; i < N; i++)
     {
-        L2L.row(i) = L2L.row(i).array() / x_nodes_temp.array();
+        L2L.row(i) = L2L.row(i).array() / prod.array();
     }
 
     return L2L;

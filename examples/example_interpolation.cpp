@@ -37,7 +37,7 @@ public:
 int main(int argc, char* argv[]) 
 {
     // Size of the Matrix:
-    int N = 10;
+    int N = 1000;
 
     // Declaration of Matrix object that abstracts data in Matrix:
     Kernel* K  = new Kernel(N);
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     Mat B = K->getMatrix(0, 0, N, N);
     Mat L, R, error;
 
-    F->getFactorization(L, R, 3);
+    F->getFactorization(L, R, 15);
     error = B - L * R.transpose();
     std::cout << "Accuracy of Factorization using Rook Pivoting:" << error.cwiseAbs().maxCoeff() << std::endl;
 }
