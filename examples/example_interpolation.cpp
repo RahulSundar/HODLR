@@ -41,12 +41,12 @@ int main(int argc, char* argv[])
 
     // Declaration of Matrix object that abstracts data in Matrix:
     Kernel* K  = new Kernel(N);
-    LowRank* F = new LowRank(K, "interpolation1d");
+    LowRank* F = new LowRank(K, "interpolation");
 
     Mat B = K->getMatrix(0, 0, N, N);
     Mat L, R, error;
 
-    F->getFactorization(L, R, 15);
+    F->getFactorization(L, R, 5);
     error = B - L * R.transpose();
     std::cout << "Accuracy of Factorization using Rook Pivoting:" << error.cwiseAbs().maxCoeff() << std::endl;
 }

@@ -53,6 +53,26 @@ Mat getL2L1D(Vec x, Vec x_nodes)
     return L2L;
 }
 
+// Gives the interpolation operator / L2L for 2D:
+Mat getL2L2D(Vec x, Vec y, Vec nodes)
+{
+    int N_nodes = nodes.size();
+
+    // Getting individual L2L operators:
+    Mat L2L_x = getL2L1D(x, nodes);
+    Mat L2L_y = getL2L1D(y, nodes);
+    
+    Mat L2L(x.size(), N_nodes * N_nodes);
+    #pragma omp parallel for
+    for(int i = 0; i < N_nodes * N_nodes; i++)
+    {
+        L2L.col(i) =  (L2L_x.col(i % N_nodes)).array() 
+                    * (L2L_y.col(i / N_nodes)).array();
+    }
+
+    return L2L;
+}
+
 Mat getM2L(Mat &nodes_1, Mat &nodes_2, Matrix* M)
 {
     // Evaluating the Kernel function at the interpolation nodes:

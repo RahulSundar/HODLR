@@ -687,40 +687,88 @@ void LowRank::RRQR(Mat& L,  Mat& R, double tolerance_or_rank,
         * Mat(rrqr.matrixQR().triangularView<Eigen::Upper>()).block(0, 0, rank, n_cols).transpose();
 }
 
-void LowRank::interpolation1d(Mat& U,  Mat& S, Mat& V, int rank,
-                              int n_row_start, int n_col_start, 
-                              int n_rows, int n_cols
-                             )
+void LowRank::interpolation(Mat& U,  Mat& S, Mat& V, int N_nodes,
+                            int n_row_start, int n_col_start, 
+                            int n_rows, int n_cols
+                           )
 {
-    if(rank < 1)
+    if(N_nodes < 1)
     {
-        std::cout << "Invalid option for interpolation. Rank needs to be explicitly mentioned" << std::endl;
+        std::cout << "Invalid option for interpolation. N_nodes needs to be explicitly mentioned" << std::endl;
         exit(1);
     }
 
     // Get the nodes for the standard interval [-1, 1]
-    Mat standard_nodes = getStandardNodes(rank, "CHEBYSHEV");
+    Mat standard_nodes = getStandardNodes(N_nodes, "CHEBYSHEV");
 
-    double c_targets, r_targets, c_sources, r_sources;
-    // Determining the center and radius of targets:
-    determineCenterAndRadius(this->A->getX(), c_targets, r_targets);
-    // Determining the center and radius of sources:
-    determineCenterAndRadius(this->A->getY(), c_sources, r_sources);
+    // Getting the targets and sources;
+    Mat targets = this->A->getX();
+    Mat sources = this->A->getY();
 
-    // Obtain the scaled Chebyshev nodes for the targets:
-    Mat nodes_targets, nodes_sources;
-    nodes_targets = scalePoints(0, 1, standard_nodes, c_targets, r_targets);
-    nodes_sources = scalePoints(0, 1, standard_nodes, c_sources, r_sources);
+    if(targets.cols() == 1)
+    {
+        double c_targets, r_targets, c_sources, r_sources;
+        // Determining the center and radius of targets:
+        determineCenterAndRadius(targets, c_targets, r_targets);
+        // Determining the center and radius of sources:
+        determineCenterAndRadius(sources, c_sources, r_sources);
 
-    // Standard Locations of the coordinates:
-    Mat standard_targets, standard_sources;
-    standard_targets = scalePoints(c_targets, r_targets, this->A->getX(), 0, 1);
-    standard_sources = scalePoints(c_sources, r_sources, this->A->getY(), 0, 1);
+        // Obtain the scaled Chebyshev nodes for the targets:
+        Mat nodes_targets, nodes_sources;
+        nodes_targets = scalePoints(0, 1, standard_nodes, c_targets, r_targets);
+        nodes_sources = scalePoints(0, 1, standard_nodes, c_sources, r_sources);
 
-    // Getting U, S, V:
-    U = getL2L1D(standard_targets, standard_nodes);
-    S = getM2L(nodes_targets, nodes_sources, this->A);
-    V = getL2L1D(standard_sources, standard_nodes);
+        // Standard Locations of the coordinates:
+        Mat standard_targets, standard_sources;
+        standard_targets = scalePoints(c_targets, r_targets, targets, 0, 1);
+        standard_sources = scalePoints(c_sources, r_sources, sources, 0, 1);
+
+        // Getting U, S, V:
+        U = getL2L1D(standard_targets, standard_nodes);
+        S = getM2L(nodes_targets, nodes_sources, this->A);
+        V = getL2L1D(standard_sources, standard_nodes);
+    }
+
+    else if(targets.cols() == 2)
+    {
+        double cx_targets, rx_targets, cx_sources, rx_sources;
+        double cy_targets, ry_targets, cy_sources, ry_sources;
+    
+        // Determining the center and radius of targets:
+        determineCenterAndRadius(targets.col(0), cx_targets, rx_targets);
+        determineCenterAndRadius(targets.col(1), cy_targets, ry_targets);
+        // Determining the center and radius of sources:
+        determineCenterAndRadius(sources.col(0), cx_sources, rx_sources);
+        determineCenterAndRadius(sources.col(1), cy_sources, ry_sources);
+
+        // Obtain the scaled Chebyshev nodes for the targets:
+        Mat nodes_targets(N_nodes, 2);
+        nodes_targets.col(0) = scalePoints(0, 1, standard_nodes, cx_targets, rx_targets).replicate(0, N_nodes);
+        nodes_targets.col(1) = scalePoints(0, 1, standard_nodes, cy_targets, ry_targets).replicate(0, N_nodes);
+
+        // Obtain the scaled Chebyshev nodes for the sources:
+        Mat nodes_sources(N_nodes * N_nodes, 2);
+        nodes_sources.col(0) = scalePoints(0, 1, standard_nodes, cx_sources, rx_sources).replicate(0, N_nodes);
+        nodes_sources.col(1) = scalePoints(0, 1, standard_nodes, cy_sources, ry_sources).replicate(0, N_nodes);
+
+        // Standard Locations of the coordinates:
+        Mat standard_targets_x = scalePoints(cx_targets, rx_targets, targets.col(0), 0, 1);
+        Mat standard_targets_y = scalePoints(cy_targets, ry_targets, targets.col(1), 0, 1);
+
+        Mat standard_sources_x = scalePoints(cx_sources, rx_sources, sources.col(0), 0, 1);
+        Mat standard_sources_y = scalePoints(cy_sources, ry_sources, sources.col(1), 0, 1);
+
+        // Getting U, S, V:
+        U = getL2L2D(standard_targets_x, standard_targets_y, standard_nodes);
+        S = getM2L(nodes_targets, nodes_sources, this->A);
+        V = getL2L2D(standard_sources_x, standard_sources_y, standard_nodes);
+    }
+
+    else
+    {
+        std::cout << "Something's wrong! We currently don't support that dimensionality" << std::endl;
+        exit(1);
+    }
 }
 
 void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
@@ -775,13 +823,13 @@ void LowRank::getFactorization(Mat& L,  Mat& R, double tolerance_or_rank,
             );
     }
 
-    else if(this->type.compare("interpolation1d") == 0)
+    else if(this->type.compare("interpolation") == 0)
     {   
         Mat U, S, V;
-        interpolation1d(U, S, V, int(tolerance_or_rank),
-                        n_row_start, n_col_start, 
-                        n_rows, n_cols
-                       );
+        interpolation(U, S, V, int(tolerance_or_rank),
+                      n_row_start, n_col_start, 
+                      n_rows, n_cols
+                     );
 
         L = U * S;
         R = V;
